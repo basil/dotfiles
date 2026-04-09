@@ -1,0 +1,19 @@
+# ~/.screenrc
+
+# Large scrollback buffer
+defscrollback 50000
+
+# Use UTF-8 everywhere.
+defutf8 on
+
+# Disable Ctrl-S/Ctrl-Q "flow control."
+defflow off
+
+# Skip intro.
+startup_message off
+
+# Detach on disconnect.
+autodetach on
+
+# Restore window contents after using (e.g.) vi.
+altscreen on

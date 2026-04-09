@@ -1,0 +1,8 @@
+---
+- hosts: localhost
+  connection: local
+  roles:
+    - dot-base
+    - dot-editor
+    - dot-shell
+    - dot-terminal

@@ -1,0 +1,9 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Lingua::EL::Poly2Mono 'poly2mono';
+
+foreach (<STDIN>) {
+	print poly2mono($_);
+}

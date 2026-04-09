@@ -1,0 +1,43 @@
+#!/bin/bash
+set -euo pipefail
+
+REPO="openai/codex"
+DEST="$HOME/.local/bin/codex"
+ASSET_PATTERN="codex-x86_64-unknown-linux-gnu.tar.gz"
+
+TAG=$(gh release list --repo "$REPO" --limit 50 --exclude-drafts --exclude-pre-releases |
+	awk -F'\t' '$2 == "Latest" {print $3}')
+
+if [[ -z "$TAG" ]]; then
+	echo "Error: no stable release found" >&2
+	exit 1
+fi
+
+echo "Latest stable release: $TAG"
+
+TMPDIR=$(mktemp -d)
+trap 'rm -rf "$TMPDIR"' EXIT
+
+echo "Downloading $ASSET_PATTERN..."
+gh release download "$TAG" --repo "$REPO" --pattern "$ASSET_PATTERN" --dir "$TMPDIR"
+
+echo "Extracting..."
+tar -xzf "$TMPDIR/$ASSET_PATTERN" -C "$TMPDIR"
+
+# Find the binary
+BIN=$(find "$TMPDIR" -type f -name "codex-*-linux-gnu" | head -1)
+
+if [[ -z "$BIN" ]]; then
+	echo "Error: could not find binary in archive" >&2
+	echo "Archive contents:"
+	find "$TMPDIR" -type f
+	exit 1
+fi
+
+mkdir -p "$(dirname "$DEST")"
+cp "$BIN" "$DEST"
+chmod +x "$DEST"
+
+echo "Installed codex $TAG to $DEST"
+
+exit 0

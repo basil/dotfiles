@@ -1,0 +1,121 @@
+#!/usr/bin/env bash
+
+# shellcheck disable=2034
+SUBDIRECTORY_OK=Yes
+
+OPTIONS_SPEC="\
+git recommit [options] [revision]
+--
+n,no-commit don't automatically commit; leave files uncommitted
+m,message=  specify commit message
+F,file=     read log from file
+"
+
+# shellcheck source=/dev/null
+. "$(git --exec-path)/git-sh-setup"
+
+require_work_tree
+cd_to_toplevel
+
+COMMIT_FILE=$GIT_DIR/recommit_msg
+
+no_commit=
+message=
+file=
+
+while test $# != 0; do
+	case "$1" in
+	-n | --no-commit)
+		no_commit=t
+		;;
+	-m | --message)
+		message=t
+		message_data="$2"
+		shift
+		;;
+	--message=*)
+		message=t
+		message_data="$(expr " $1" : ' --message=\(.*\)')"
+		;;
+	-F | --file)
+		file=t
+		file_data="$2"
+		shift
+		;;
+	--file=*)
+		file=t
+		file_data="$(expr " $1" : ' --message=\(.*\)')"
+		;;
+	--)
+		shift
+		break
+		;;
+	-*)
+		usage
+		;;
+	*)
+		break
+		;;
+	esac
+	shift
+done
+
+case "$no_commit,$file,$message" in
+t,*t*) die "fatal: Option -n cannot be combined with -m or -F." ;;
+,t,t) die "fatal: Option -m cannot be combined with -F." ;;
+esac
+
+test $# -gt 1 && usage
+
+require_clean_work_tree "recommit" "Please commit or stash them."
+
+if [[ $# -gt 0 ]]; then
+	base=$1
+else
+	branch="$(git symbolic-ref HEAD 2>/dev/null)" ||
+		die "fatal: Detached head."
+
+	base=$(git for-each-ref --format="%(upstream)" "$branch")
+	if [[ -z $base ]]; then
+		hotfix=$(git describe --tags --match=release/* --abbrev=0)
+		#
+		# If there were more than 10 intervening commits, infer that
+		# this is not a really a hotfix, but rather a failure to set
+		# the origin.
+		#
+		n=$(git log -11 --pretty=format: "${hotfix}..HEAD" | wc -l)
+		[[ $n -eq 10 ]] && die "fatal: No upstream set for '$branch'"
+
+		base=$hotfix
+	fi
+fi
+
+oldhead=$(git rev-parse HEAD)
+
+#
+# Find the common ancestor to roll back to.
+#
+mergebase=$(git merge-base "$base" "$oldhead")
+
+#
+# Reset HEAD to our common ancestor while preserving the list of added,
+# deleted, or modified files.
+#
+git reset --soft "$mergebase"
+
+case "$no_commit,$file,$message" in
+t,*) ;;
+,t,) git commit --file="$file_data" ;;
+,,t) git commit --message="$message_data" ;;
+,,)
+	#
+	# Seed the commit message and perform the commit.
+	#
+	git log --pretty="%B" "${mergebase}..${oldhead}" | sed -n '$!p' |
+		grep -v '^Merge branch' | sort | uniq >"$COMMIT_FILE"
+	git commit --file="$COMMIT_FILE" --edit
+	rm -f "$COMMIT_FILE"
+	;;
+esac
+
+exit 0

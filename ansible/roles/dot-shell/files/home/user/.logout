@@ -1,0 +1,29 @@
+#
+# Clear caches, if present.
+#
+
+if [[ -d "$HOME/.ansible/tmp" ]]; then
+	rm -rf "$HOME/.ansible/tmp"
+fi
+
+if [[ -d "$HOME/.java/fonts" ]]; then
+	rm -rf "$HOME/.java/fonts"
+fi
+
+if [[ -f "$HOME/.lesshst" ]]; then
+	rm -f "$HOME/.lesshst"
+fi
+
+if [[ -f "$HOME/.python_history" ]]; then
+	rm -f "$HOME/.python_history"
+fi
+
+if [[ -f "$HOME/.viminfo" ]]; then
+	rm -f "$HOME/.viminfo"
+fi
+
+if [[ -f "$HOME/.wget-hsts" ]]; then
+	rm -f "$HOME/.wget-hsts"
+fi
+
+rm -f ~/.claude.json.backup.*

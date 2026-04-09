@@ -1,0 +1,168 @@
+#
+# ~/.aliases: Aliases for both bash(1) and zsh(1).
+#
+
+# General
+alias a2ps='a2ps -1 -R'
+alias anyone='anyone -c'
+alias bc='bc -l -q'
+alias cat='bat -p --theme=Nord'
+alias cstyle='cstyle -c -p -P'
+alias df=duf
+alias du='du -h'
+alias emacs='emacs -nw'
+alias fd='fd -H'
+alias genpasswd='apg -t -m 12 -M NCL'
+alias incognito='unset HISTFILE'
+alias logout='loginctl kill-session $XDG_SESSION_ID'
+alias m2clean='find ~/.m2/repository -name \*SNAPSHOT -type d -print0 | xargs -0 rm -rfv'
+alias mtr='mtr --curses'
+alias nano='nano -dw'
+alias parallel='parallel --citation'
+alias pbmd='wl-paste -t text/html | html2text | unidecode | ws | wl-copy'
+alias pingstat='pgrep ping | xargs -n 1 kill -SIGINFO'
+alias xxd='hexyl'
+alias ws='sed "s/[[:space:]]\+$//"'
+alias zmount='sudo zfs load-key -a && sudo zfs mount -a'
+
+# Lazy 1-letter aliases for generic stuff
+alias c=clear
+alias e='$EDITOR -p'
+alias f=firefox
+alias s=ssh
+
+# Lazy Git aliases
+alias gb='git branch -v'
+alias gcp='git cherry-pick'
+alias gl='git log --abbrev-commit --decorate'
+alias gp='git pull'
+alias gra='git commit --amend --reset-author'
+alias grc='git recommit'
+alias gr='git remote -v'
+
+# OpenSSL
+alias sslhash='openssl x509 -noout -hash -in'
+alias sslinfo='openssl x509 -noout -fingerprint -text -in'
+
+# For looking up IP addresses
+alias arin='whois -h whois.arin.net'
+alias apnic='whois -h whois.apnic.net'
+alias ripe='whois -h whois.ripe.net'
+alias lacnic='whois -h whois.lacnic.net'
+
+# Date aliases
+alias gmt='date -u'
+alias utc='date -u'
+alias sfo='TZ=US/Pacific date'
+alias pvd='TZ=US/Eastern date'
+alias syd='TZ=Australia/Sydney date'
+alias lon='TZ=Europe/London date'
+alias hnl='TZ=US/Hawaii date'
+
+# Printing aliases
+alias lpr='lpr -o PageSize=Letter'
+alias lpmanual='lp -o InputSlot=Tray1'           # Print to manual paper tray in Phaser
+alias lpsingle='lp -o sides=one-sided'           # Print single-sided
+alias lpduplex='lp -o sides=two-sided-long-edge' # Print double-sided
+
+# File encryption
+alias encrypt='gpg -c --force-mdc --cipher-algo TWOFISH'
+alias decrypt='gpg -d'
+
+# Webcam
+alias zoomin='v4l2-ctl -d /dev/video0 --set-ctrl=zoom_absolute=2'
+alias zoomout='v4l2-ctl -d /dev/video0 --set-ctrl=zoom_absolute=1'
+
+# OS-specific aliases
+if [[ $BASIL_DOTFILES_KERNEL == "Darwin" ]]; then
+	alias burn='drutil burn'
+	alias eject='drutil eject'
+	alias flushdns='dscacheutil -flushcache && sudo killall -HUP mDNSResponder'
+	alias repair='sudo ifconfig en0 down && sleep 5 && sudo ifconfig en0 up'
+elif [[ $BASIL_DOTFILES_KERNEL == "Linux" ]]; then
+	alias open='xdg-open'
+	if [[ -n $WAYLAND_DISPLAY ]]; then
+		alias pbcopy='wl-copy'
+		alias pbpaste='wl-paste'
+	elif [[ -n $DISPLAY ]]; then
+		alias pbcopy='xclip -selection clipboard'
+		alias pbpaste='xclip -selection clipboard -o'
+	fi
+	alias xlock='loginctl lock-session'
+fi
+
+#
+# Configure ls(1), grep(1) and variants, and readlink(1).
+#
+if [[ $BASIL_DOTFILES_KERNEL == 'Linux' ]]; then
+	#
+	# Linux always uses GNU Coreutils.
+	#
+	if [[ -x /usr/bin/lsd ]]; then
+		alias ls='lsd --color=auto -AFh'
+	else
+		alias ls='ls --color=auto -AFh'
+	fi
+	alias grep='grep --color=auto'
+	alias egrep='egrep --color=auto'
+	alias fgrep='fgrep --color=auto'
+
+	if [[ -x /opt/wget-1.25.0/bin/wget ]]; then
+		alias wget=/opt/wget-1.25.0/bin/wget
+	fi
+else
+	#
+	# Other Unices may or may not have GNU Coreutils installed.
+	#
+
+	#
+	# If we have GNU ls, use it; if not, fall back to traditional ls.
+	#
+	if [[ -x /opt/homebrew/bin/gls ]]; then
+		alias ls='/opt/homebrew/bin/gls --color=auto -AFh'
+	elif [[ -x /usr/gnu/bin/ls ]]; then
+		alias ls='/usr/gnu/bin/ls --color=auto -AFh'
+	elif [[ -x /usr/local/bin/gls ]]; then
+		alias ls='/usr/local/bin/gls --color=auto -AFh'
+	else
+		alias ls='ls -AFh'
+	fi
+
+	#
+	# If we have GNU grep, use it.
+	#
+	if [[ -x /opt/homebrew/bin/ggrep ]]; then
+		alias grep='/opt/homebrew/bin/ggrep --color=auto'
+	elif [[ -x /usr/gnu/bin/grep ]]; then
+		alias grep='/usr/gnu/bin/grep --color=auto'
+	elif [[ -x /usr/local/bin/ggrep ]]; then
+		alias grep='/usr/local/bin/ggrep --color=auto'
+	fi
+
+	if [[ -x /opt/homebrew/bin/gegrep ]]; then
+		alias egrep='/opt/homebrew/bin/gegrep --color=auto'
+	elif [[ -x /usr/gnu/bin/egrep ]]; then
+		alias egrep='/usr/gnu/bin/egrep --color=auto'
+	elif [[ -x /usr/local/bin/gegrep ]]; then
+		alias egrep='/usr/local/bin/gegrep --color=auto'
+	fi
+
+	if [[ -x /opt/homebrew/bin/gfgrep ]]; then
+		alias fgrep='/opt/homebrew/bin/gfgrep --color=auto'
+	elif [[ -x /usr/gnu/bin/fgrep ]]; then
+		alias fgrep='/usr/gnu/bin/fgrep --color=auto'
+	elif [[ -x /usr/local/bin/gfgrep ]]; then
+		alias fgrep='/usr/local/bin/gfgrep --color=auto'
+	fi
+
+	#
+	# If we have GNU readlink, use it.
+	#
+	if [[ -x /opt/homebrew/bin/greadlink ]]; then
+		alias readlink='/opt/homebrew/bin/greadlink'
+	elif [[ -x /usr/gnu/bin/readlink ]]; then
+		alias readlink='/usr/gnu/bin/readlink'
+	elif [[ -x /usr/local/bin/greadlink ]]; then
+		alias readlink='/usr/local/bin/greadlink'
+	fi
+fi

@@ -1,0 +1,35 @@
+---
+- include_tasks: tasks/symlink-files.yml
+
+- git:
+    repo: "https://github.com/agkozak/agkozak-zsh-prompt.git"
+    dest: "{{ ansible_user_dir }}/.zsh/plugins/agkozak-zsh-prompt"
+    update: true
+
+- get_url:
+    url: "https://raw.githubusercontent.com/nordtheme/dircolors/develop/src/dir_colors"
+    dest: "{{ ansible_user_dir }}/.dircolors"
+    checksum: sha256:2e2bbd2d793fc780bdbe95f6a5cb09083c955368c60c710791f9c0e0f9590734
+
+- file:
+    path: "{{ ansible_user_dir }}/.bashrc.d"
+    state: directory
+    owner: "{{ ansible_user_id }}"
+    mode: 0755
+
+- get_url:
+    url: "https://github.com/mvdan/sh/releases/download/v{{ shfmt_version }}/shfmt_v{{ shfmt_version }}_{{ ansible_system | lower }}_amd64"
+    dest: "{{ ansible_user_dir }}/.local/bin/shfmt"
+    mode: 0755
+    checksum: "sha256:{{ shfmt_checksum }}"
+
+- get_url:
+    url: "https://github.com/mroth/scmpuff/releases/download/v{{ scmpuff_version }}/scmpuff_{{ scmpuff_version }}_{{ ansible_system | lower }}_amd64.tar.gz"
+    dest: "/var/tmp/scmpuff_{{ scmpuff_version }}_{{ ansible_system | lower }}_x64.tar.gz"
+    checksum: "sha256:{{ scmpuff_checksum }}"
+
+- unarchive:
+    src: "/var/tmp/scmpuff_{{ scmpuff_version }}_{{ ansible_system | lower }}_x64.tar.gz"
+    dest: "{{ ansible_user_dir }}/.local/bin"
+    extra_opts:
+      - scmpuff

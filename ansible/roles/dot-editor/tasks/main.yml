@@ -1,0 +1,49 @@
+---
+- include_tasks: tasks/symlink-files.yml
+
+- file:
+    path: "{{ ansible_user_dir }}/{{ item }}"
+    state: directory
+    owner: "{{ ansible_user_id }}"
+    mode: 0755
+  with_items:
+    - .vim
+    - .vim/autoload
+    - .vim/colors
+    - .vim/bundle
+    - .vim/plugin
+    - .vim/syntax
+
+- get_url:
+    url: "https://tpo.pe/pathogen.vim"
+    dest: "{{ ansible_user_dir }}/.vim/autoload/pathogen.vim"
+
+- git:
+    repo: "{{ item }}"
+    dest: "{{ ansible_user_dir }}/.vim/bundle/{{ (item | basename | splitext)[0] }}"
+    update: true
+  with_items:
+    - https://github.com/airblade/vim-gitgutter.git
+    - https://github.com/nordtheme/vim.git
+    - https://github.com/tpope/vim-fugitive.git
+    - https://github.com/tpope/vim-scriptease.git
+    - https://github.com/tpope/vim-sensible.git
+    - https://github.com/tpope/vim-sleuth.git
+    - https://github.com/vim-airline/vim-airline.git
+
+- file:
+    path: "{{ ansible_user_dir }}/.local/share/nvim/site/pack/plugins/opt"
+    state: directory
+    owner: "{{ ansible_user_id }}"
+    mode: 0755
+
+- git:
+    repo: "{{ item }}"
+    dest: "{{ ansible_user_dir }}/.local/share/nvim/site/pack/plugins/opt/{{ (item | basename | splitext)[0] }}"
+    update: true
+  with_items:
+    - https://github.com/EdenEast/nightfox.nvim.git
+    - https://github.com/folke/snacks.nvim.git
+    - https://github.com/lewis6991/gitsigns.nvim.git
+    - https://github.com/NMAC427/guess-indent.nvim.git
+    - https://github.com/nvim-lualine/lualine.nvim.git

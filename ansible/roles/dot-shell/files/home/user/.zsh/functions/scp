@@ -1,0 +1,9 @@
+#
+# Fix a common error.
+#
+if [[ $* =~ : ]]; then
+	command scp "$@"
+else
+	echo 'You forgot the colon, dumbass!' >&2
+	return 1
+fi

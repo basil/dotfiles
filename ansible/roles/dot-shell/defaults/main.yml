@@ -1,0 +1,8 @@
+---
+shfmt_version: 3.13.1
+# https://github.com/mvdan/sh/releases/download/v3.13.1/sha256sums.txt
+shfmt_checksum: fb096c5d1ac6beabbdbaa2874d025badb03ee07929f0c9ff67563ce8c75398b1
+
+scmpuff_version: 0.6.3
+# https://github.com/mroth/scmpuff/releases/download/v0.6.3/checksums.txt
+scmpuff_checksum: 199a05e0ea0e8390a08ca0b4208ffbdd8c2323e2fd2cc6253a265e5ae0e6f60e
