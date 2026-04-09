@@ -6,7 +6,11 @@
 alias a2ps='a2ps -1 -R'
 alias anyone='anyone -c'
 alias bc='bc -l -q'
-alias cat='bat -p --theme=Nord'
+if [[ -x /usr/bin/batcat ]]; then
+	alias cat='batcat -p --theme=Nord'
+elif [[ -x /usr/bin/bat ]]; then
+	alias cat='bat -p --theme=Nord'
+fi
 alias cstyle='cstyle -c -p -P'
 alias df=duf
 alias du='du -h'
