@@ -8,7 +8,7 @@ ASSET_PATTERN="codex-x86_64-unknown-linux-gnu.tar.gz"
 TAG=$(gh release list --repo "$REPO" --limit 50 --exclude-drafts --exclude-pre-releases |
 	awk -F'\t' '$2 == "Latest" {print $3}')
 
-if [[ -z "$TAG" ]]; then
+if [[ -z $TAG ]]; then
 	echo "Error: no stable release found" >&2
 	exit 1
 fi
@@ -27,7 +27,7 @@ tar -xzf "$TMPDIR/$ASSET_PATTERN" -C "$TMPDIR"
 # Find the binary
 BIN=$(find "$TMPDIR" -type f -name "codex-*-linux-gnu" | head -1)
 
-if [[ -z "$BIN" ]]; then
+if [[ -z $BIN ]]; then
 	echo "Error: could not find binary in archive" >&2
 	echo "Archive contents:"
 	find "$TMPDIR" -type f
