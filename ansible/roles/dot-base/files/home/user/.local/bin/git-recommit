@@ -44,7 +44,7 @@ while test $# != 0; do
 		;;
 	--file=*)
 		file=t
-		file_data="$(expr " $1" : ' --message=\(.*\)')"
+		file_data="$(expr " $1" : ' --file=\(.*\)')"
 		;;
 	--)
 		shift

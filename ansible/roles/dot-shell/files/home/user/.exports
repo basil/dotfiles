@@ -81,18 +81,20 @@ fi
 export PYTHONIOENCODING=UTF-8
 
 #
-# Use a color terminal.
+# Upgrade to a color terminal if the current TERM is plain xterm.
 #
-if [[ -f /lib/terminfo/x/xterm-256color || -f /usr/share/terminfo/x/xterm-256color || -f /usr/share/lib/terminfo/x/xterm-256color ]]; then
-	export TERM='xterm-256color'
-elif [[ -f /lib/terminfo/x/xterm-color || -f /usr/share/terminfo/x/xterm-color || -f /usr/share/lib/terminfo/x/xterm-color ]]; then
-	export TERM='xterm-color'
+if [[ $TERM == "xterm" ]]; then
+	if [[ -f /lib/terminfo/x/xterm-256color || -f /usr/share/terminfo/x/xterm-256color || -f /usr/share/lib/terminfo/x/xterm-256color ]]; then
+		export TERM='xterm-256color'
+	elif [[ -f /lib/terminfo/x/xterm-color || -f /usr/share/terminfo/x/xterm-color || -f /usr/share/lib/terminfo/x/xterm-color ]]; then
+		export TERM='xterm-color'
+	fi
 fi
 
 #
 # Better than nano.
 #
-export SYSTEMD_EDITOR=vim
+export SYSTEMD_EDITOR=nvim
 
 #
 # Bun

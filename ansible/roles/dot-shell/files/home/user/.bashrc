@@ -69,7 +69,7 @@ if [[ -f ~/.aliases ]]; then
 	. ~/.aliases
 fi
 
-alias rehash='. ~/.bashrc ; . ~/.bash_profile ; . ~/.bash_alias'
+alias rehash='. ~/.bashrc ; . ~/.bash_profile ; . ~/.aliases'
 
 # Functions
 function calc() {
@@ -77,7 +77,11 @@ function calc() {
 }
 
 function myip() {
-	/sbin/ifconfig -a | grep -v inet6 | grep inet | grep -v tunnel | grep -v "127.0.0.1" | awk '{print $2}' | cut -d : -f 2
+	if [[ -x /usr/sbin/ifconfig ]]; then
+		/usr/sbin/ifconfig -a | grep -v inet6 | grep inet | grep -v tunnel | grep -v "127.0.0.1" | awk '{print $2}' | cut -d : -f 2
+	else
+		ip -4 -o addr show scope global | awk '{print $4}' | cut -d / -f 1
+	fi
 }
 
 function server() {

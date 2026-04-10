@@ -12,20 +12,25 @@ elif [[ -x /usr/bin/bat ]]; then
 	alias cat='bat -p --theme=Nord'
 fi
 alias cstyle='cstyle -c -p -P'
-alias df=duf
+if [[ -x /usr/bin/duf ]]; then
+	alias df=duf
+fi
 alias du='du -h'
 alias emacs='emacs -nw'
 alias fd='fd -H'
 alias genpasswd='apg -t -m 12 -M NCL'
 alias incognito='unset HISTFILE'
-alias logout='loginctl kill-session $XDG_SESSION_ID'
+if [[ -x /usr/bin/loginctl ]]; then
+	alias logout='loginctl kill-session $XDG_SESSION_ID'
+fi
 alias m2clean='find ~/.m2/repository -name \*SNAPSHOT -type d -print0 | xargs -0 rm -rfv'
 alias mtr='mtr --curses'
 alias nano='nano -dw'
 alias parallel='parallel --citation'
 alias pbmd='wl-paste -t text/html | html2text | unidecode | ws | wl-copy'
-alias pingstat='pgrep ping | xargs -n 1 kill -SIGINFO'
-alias xxd='hexyl'
+if [[ -x /usr/bin/hexyl ]]; then
+	alias xxd='hexyl'
+fi
 alias ws='sed "s/[[:space:]]\+$//"'
 alias zmount='sudo zfs load-key -a && sudo zfs mount -a'
 
@@ -108,8 +113,8 @@ if [[ $BASIL_DOTFILES_KERNEL == 'Linux' ]]; then
 		alias ls='ls --color=auto -AFh'
 	fi
 	alias grep='grep --color=auto'
-	alias egrep='egrep --color=auto'
-	alias fgrep='fgrep --color=auto'
+	alias egrep='grep -E --color=auto'
+	alias fgrep='grep -F --color=auto'
 
 	if [[ -x /opt/wget-1.25.0/bin/wget ]]; then
 		alias wget=/opt/wget-1.25.0/bin/wget
@@ -143,20 +148,20 @@ else
 		alias grep='/usr/local/bin/ggrep --color=auto'
 	fi
 
-	if [[ -x /opt/homebrew/bin/gegrep ]]; then
-		alias egrep='/opt/homebrew/bin/gegrep --color=auto'
-	elif [[ -x /usr/gnu/bin/egrep ]]; then
-		alias egrep='/usr/gnu/bin/egrep --color=auto'
-	elif [[ -x /usr/local/bin/gegrep ]]; then
-		alias egrep='/usr/local/bin/gegrep --color=auto'
+	if [[ -x /opt/homebrew/bin/ggrep ]]; then
+		alias egrep='/opt/homebrew/bin/ggrep -E --color=auto'
+	elif [[ -x /usr/gnu/bin/grep ]]; then
+		alias egrep='/usr/gnu/bin/grep -E --color=auto'
+	elif [[ -x /usr/local/bin/ggrep ]]; then
+		alias egrep='/usr/local/bin/ggrep -E --color=auto'
 	fi
 
-	if [[ -x /opt/homebrew/bin/gfgrep ]]; then
-		alias fgrep='/opt/homebrew/bin/gfgrep --color=auto'
-	elif [[ -x /usr/gnu/bin/fgrep ]]; then
-		alias fgrep='/usr/gnu/bin/fgrep --color=auto'
-	elif [[ -x /usr/local/bin/gfgrep ]]; then
-		alias fgrep='/usr/local/bin/gfgrep --color=auto'
+	if [[ -x /opt/homebrew/bin/ggrep ]]; then
+		alias fgrep='/opt/homebrew/bin/ggrep -F --color=auto'
+	elif [[ -x /usr/gnu/bin/grep ]]; then
+		alias fgrep='/usr/gnu/bin/grep -F --color=auto'
+	elif [[ -x /usr/local/bin/ggrep ]]; then
+		alias fgrep='/usr/local/bin/ggrep -F --color=auto'
 	fi
 
 	#
