@@ -256,13 +256,21 @@ function set_osc7() {
 	[[ -z $KONSOLE_PROFILE_NAME && -z $KONSOLE_DBUS_SESSION ]] || url_host=""
 
 	# common control sequence (OSC 7) to set current host and path
-	printf "\e]7;file://%s%s\e\\" "${url_host}" "${url_path}"
+	printf "\e]7;file://%s%s\a" "${url_host}" "${url_path}"
 }
 
 #
-# Hook set_osc7 to run before each prompt.
+# Hook set_osc7 to report CWD changes.
 #
-precmd_functions+=(set_osc7)
+if ((!$+_osc7_initialized)); then
+	typeset -gi _osc7_initialized=1
+	chpwd_functions+=(set_osc7)
+	# An executed program could change cwd and report the changed cwd, so also
+	# report cwd at each new prompt, as chpwd_functions is insufficient.
+	# chpwd_functions is still needed for things like: cd x && something
+	precmd_functions+=(set_osc7)
+fi
+set_osc7
 
 #
 # bun completions
