@@ -150,16 +150,15 @@ zmodload zsh/langinfo
 #   O_CLOEXEC. The only way to create a file descriptor with O_CLOEXEC is via
 #   sysopen.
 #
-if ((!_tty_fd)); then
-	typeset -gi _tty_fd
-	if zmodload zsh/system 2>/dev/null && (($+builtins[sysopen])); then
+if [[ -z $_tty_fd ]]; then
+	if zmodload zsh/system 2>/dev/null; then
 		if [[ -w $TTY ]]; then
 			sysopen -o cloexec -wu _tty_fd -- $TTY
 		elif [[ -w /dev/tty ]]; then
 			sysopen -o cloexec -wu _tty_fd -- /dev/tty
 		fi
 	fi
-	if ((!_tty_fd)) && [[ -t 1 ]]; then
+	if [[ -z $_tty_fd ]] && [[ -t 1 ]]; then
 		_tty_fd=1
 	fi
 fi
@@ -198,7 +197,6 @@ function prompt_urlencode() {
 	zparseopts -D -E -a opts r m P
 
 	local in_str="$@"
-	local url_str=""
 	local spaces_as_plus
 	if [[ -z $opts[(r)-P] ]]; then spaces_as_plus=1; fi
 	local str="$in_str"
@@ -281,7 +279,7 @@ function set_osc7() {
 	[[ -z $KONSOLE_PROFILE_NAME && -z $KONSOLE_DBUS_SESSION ]] || url_host=""
 
 	# common control sequence (OSC 7) to set current host and path
-	if ((_tty_fd)); then
+	if [[ -n $_tty_fd ]]; then
 		print -nu $_tty_fd "\e]7;file://${url_host}${url_path}\a"
 	fi
 }
@@ -289,8 +287,8 @@ function set_osc7() {
 #
 # Hook set_osc7 to report CWD changes.
 #
-if ((!$+_osc7_initialized)); then
-	typeset -gi _osc7_initialized=1
+if [[ -z $_osc7_initialized ]]; then
+	_osc7_initialized=1
 	chpwd_functions+=(set_osc7)
 	# An executed program could change cwd and report the changed cwd, so also
 	# report cwd at each new prompt, as chpwd_functions is insufficient.
@@ -305,8 +303,8 @@ set_osc7
 # In precmd: shows the abbreviated working directory.
 # In preexec: shows the command being executed.
 #
-if ((_tty_fd)) && [[ -z $GHOSTTY_RESOURCES_DIR ]] && ((!$+_title_initialized)); then
-	typeset -gi _title_initialized=1
+if [[ -n $_tty_fd ]] && [[ -z $GHOSTTY_RESOURCES_DIR ]] && [[ -z $_title_initialized ]]; then
+	_title_initialized=1
 
 	_title_precmd() {
 		print -rnu $_tty_fd $'\e]2;'"${(%):-%(4~|…/%3~|%~)}"$'\a'
