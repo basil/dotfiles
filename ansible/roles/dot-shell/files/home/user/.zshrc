@@ -246,7 +246,7 @@ function prompt_urlencode() {
 				# Termux does not have non-UTF8 locales, so just send the UTF-8 character directly
 				url_str+="$byte"
 			else
-				ord=$(( [##16] #byte ))
+				printf -v ord '%02X' "'$byte"
 				url_str+="%$ord"
 			fi
 		fi
