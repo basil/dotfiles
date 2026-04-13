@@ -300,6 +300,26 @@ fi
 set_osc7
 
 #
+# Set the terminal title (OSC 2) for user-friendly display.
+#
+# In precmd: shows the abbreviated working directory.
+# In preexec: shows the command being executed.
+#
+if ((_tty_fd)) && [[ -z $GHOSTTY_RESOURCES_DIR ]] && ((!$+_title_initialized)); then
+	typeset -gi _title_initialized=1
+
+	_title_precmd() {
+		print -rnu $_tty_fd $'\e]2;'"${(%):-%(4~|…/%3~|%~)}"$'\a'
+	}
+	precmd_functions+=(_title_precmd)
+
+	_title_preexec() {
+		print -rnu $_tty_fd $'\e]2;'"${1//[[:cntrl:]]/}"$'\a'
+	}
+	preexec_functions+=(_title_preexec)
+fi
+
+#
 # bun completions
 #
 [[ -s "${HOME}/.bun/_bun" ]] && source "${HOME}/.bun/_bun"
