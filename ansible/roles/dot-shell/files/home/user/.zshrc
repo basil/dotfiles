@@ -267,9 +267,6 @@ function prompt_urlencode() {
 function set_osc7() {
 	setopt localoptions unset
 
-	# Ghostty has its own zsh integration
-	[[ -z $GHOSTTY_RESOURCES_DIR ]] || return
-
 	# Percent-encode the host and path names.
 	local url_host url_path
 	url_host="$(prompt_urlencode -P $HOST)" || return 1
@@ -287,15 +284,15 @@ function set_osc7() {
 #
 # Hook set_osc7 to report CWD changes.
 #
-if [[ -z $BASIL_DOTFILES_OSC7_INITIALIZED ]]; then
+if [[ -z $GHOSTTY_RESOURCES_DIR ]] && [[ -z $BASIL_DOTFILES_OSC7_INITIALIZED ]]; then
 	BASIL_DOTFILES_OSC7_INITIALIZED=1
 	chpwd_functions+=(set_osc7)
 	# An executed program could change cwd and report the changed cwd, so also
 	# report cwd at each new prompt, as chpwd_functions is insufficient.
 	# chpwd_functions is still needed for things like: cd x && something
 	precmd_functions+=(set_osc7)
+	set_osc7
 fi
-set_osc7
 
 #
 # Set the terminal title (OSC 2) for user-friendly display.
