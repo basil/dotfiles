@@ -143,23 +143,23 @@ zmodload zsh/langinfo
 # Attempt to create a writable file descriptor to the TTY so that we can print
 # to the TTY later even when STDOUT is redirected. This code is fairly subtle.
 #
-# - It's tempting to do `[[ -t 1 ]] && exec {_tty_fd}>&1` but we cannot do this
+# - It's tempting to do `[[ -t 1 ]] && exec {BASIL_DOTFILES_TTY_FD}>&1` but we cannot do this
 #   because it'll create a file descriptor >= 10 without O_CLOEXEC. This file
 #   descriptor will leak to child processes.
 # - Zsh doesn't expose dup3, which would have allowed us to copy STDOUT with
 #   O_CLOEXEC. The only way to create a file descriptor with O_CLOEXEC is via
 #   sysopen.
 #
-if [[ -z $_tty_fd ]]; then
+if [[ -z $BASIL_DOTFILES_TTY_FD ]]; then
 	if zmodload zsh/system 2>/dev/null; then
 		if [[ -w $TTY ]]; then
-			sysopen -o cloexec -wu _tty_fd -- $TTY
+			sysopen -o cloexec -wu BASIL_DOTFILES_TTY_FD -- $TTY
 		elif [[ -w /dev/tty ]]; then
-			sysopen -o cloexec -wu _tty_fd -- /dev/tty
+			sysopen -o cloexec -wu BASIL_DOTFILES_TTY_FD -- /dev/tty
 		fi
 	fi
-	if [[ -z $_tty_fd ]] && [[ -t 1 ]]; then
-		_tty_fd=1
+	if [[ -z $BASIL_DOTFILES_TTY_FD ]] && [[ -t 1 ]]; then
+		BASIL_DOTFILES_TTY_FD=1
 	fi
 fi
 
@@ -279,16 +279,16 @@ function set_osc7() {
 	[[ -z $KONSOLE_PROFILE_NAME && -z $KONSOLE_DBUS_SESSION ]] || url_host=""
 
 	# common control sequence (OSC 7) to set current host and path
-	if [[ -n $_tty_fd ]]; then
-		print -nu $_tty_fd "\e]7;file://${url_host}${url_path}\a"
+	if [[ -n $BASIL_DOTFILES_TTY_FD ]]; then
+		print -nu $BASIL_DOTFILES_TTY_FD "\e]7;file://${url_host}${url_path}\a"
 	fi
 }
 
 #
 # Hook set_osc7 to report CWD changes.
 #
-if [[ -z $_osc7_initialized ]]; then
-	_osc7_initialized=1
+if [[ -z $BASIL_DOTFILES_OSC7_INITIALIZED ]]; then
+	BASIL_DOTFILES_OSC7_INITIALIZED=1
 	chpwd_functions+=(set_osc7)
 	# An executed program could change cwd and report the changed cwd, so also
 	# report cwd at each new prompt, as chpwd_functions is insufficient.
@@ -303,16 +303,16 @@ set_osc7
 # In precmd: shows the abbreviated working directory.
 # In preexec: shows the command being executed.
 #
-if [[ -n $_tty_fd ]] && [[ -z $GHOSTTY_RESOURCES_DIR ]] && [[ -z $_title_initialized ]]; then
-	_title_initialized=1
+if [[ -n $BASIL_DOTFILES_TTY_FD ]] && [[ -z $GHOSTTY_RESOURCES_DIR ]] && [[ -z $BASIL_DOTFILES_TITLE_INITIALIZED ]]; then
+	BASIL_DOTFILES_TITLE_INITIALIZED=1
 
 	_title_precmd() {
-		print -rnu $_tty_fd $'\e]2;'"${(%):-%(4~|…/%3~|%~)}"$'\a'
+		print -rnu $BASIL_DOTFILES_TTY_FD $'\e]2;'"${(%):-%(4~|…/%3~|%~)}"$'\a'
 	}
 	precmd_functions+=(_title_precmd)
 
 	_title_preexec() {
-		print -rnu $_tty_fd $'\e]2;'"${1//[[:cntrl:]]/}"$'\a'
+		print -rnu $BASIL_DOTFILES_TTY_FD $'\e]2;'"${1//[[:cntrl:]]/}"$'\a'
 	}
 	preexec_functions+=(_title_preexec)
 fi
