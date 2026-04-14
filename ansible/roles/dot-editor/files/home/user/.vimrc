@@ -13,7 +13,6 @@ syntax enable
 colorscheme nord
 
 set clipboard^=unnamed,unnamedplus
-set guifont=BerkeleyMono\ Nerd\ Font\ Mono\ 11
 set hidden		" Hide buffers when they are abandoned.
 set nobackup		" Do not keep a backup file.
 set nojoinspaces	" Use one space after a period.

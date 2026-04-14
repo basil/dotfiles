@@ -22,7 +22,6 @@ vim.cmd("filetype plugin indent on")
 
 vim.opt.clipboard = "unnamedplus" -- Use system clipboard.
 vim.opt.termguicolors = true      -- Enable 24-bit color.
-vim.opt.guifont = "BerkeleyMono Nerd Font Mono 11"
 
 
 
