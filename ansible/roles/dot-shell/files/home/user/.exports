@@ -23,7 +23,7 @@ fi
 #
 # Make vim(1) the default editor.
 #
-export EDITOR=nvim
+export EDITOR=vim
 
 #
 # Make less more friendly for non-text input files; see lesspipe(1).
@@ -94,7 +94,7 @@ fi
 #
 # Better than nano.
 #
-export SYSTEMD_EDITOR=nvim
+export SYSTEMD_EDITOR=vim
 
 #
 # Bun
