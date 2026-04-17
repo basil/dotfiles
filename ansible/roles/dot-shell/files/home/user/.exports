@@ -103,3 +103,10 @@ if [[ -d ~/.bun ]]; then
 	export BUN_INSTALL="${HOME}/.bun"
 	export PATH="${BUN_INSTALL}/bin:$PATH"
 fi
+
+#
+# Cargo
+#
+if [[ -d ~/.cargo/bin ]]; then
+	export PATH=~/.cargo/bin:$PATH
+fi
