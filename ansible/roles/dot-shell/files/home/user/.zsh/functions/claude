@@ -1,0 +1,4 @@
+if ! git rev-parse --is-inside-work-tree &>/dev/null; then
+	cd "$(mktemp -d -t claude.XXXXXXXX)" || return
+fi
+exec command claude "$@"
