@@ -41,7 +41,7 @@ setopt SHARE_HISTORY          # Constantly share history between shell instances
 #
 # scmpuff
 #
-eval "$(scmpuff init -s)"
+[[ -o interactive ]] && eval "$(scmpuff init -s)"
 
 #
 # Alias definitions
