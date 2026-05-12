@@ -3,7 +3,6 @@ set -euo pipefail
 
 REPO="openai/codex"
 DEST="$HOME/.local/bin/codex"
-ASSET_PATTERN="codex-x86_64-unknown-linux-gnu.tar.gz"
 
 TAG=$(gh release list --repo "$REPO" --limit 50 --exclude-drafts --exclude-pre-releases |
 	awk -F'\t' '$2 == "Latest" {print $3}')
@@ -15,6 +14,22 @@ fi
 
 echo "Latest stable release: $TAG"
 
+ASSETS=$(gh release view "$TAG" --repo "$REPO" --json assets --jq '.assets[].name')
+
+ASSET_PATTERN=""
+for libc in gnu musl; do
+	candidate="codex-x86_64-unknown-linux-${libc}.tar.gz"
+	if grep -Fxq "$candidate" <<<"$ASSETS"; then
+		ASSET_PATTERN="$candidate"
+		break
+	fi
+done
+
+if [[ -z $ASSET_PATTERN ]]; then
+	echo "Error: no linux x86_64 asset (gnu or musl) found in $TAG" >&2
+	exit 1
+fi
+
 TMPDIR=$(mktemp -d)
 trap 'rm -rf "$TMPDIR"' EXIT
 
@@ -24,8 +39,7 @@ gh release download "$TAG" --repo "$REPO" --pattern "$ASSET_PATTERN" --dir "$TMP
 echo "Extracting..."
 tar -xzf "$TMPDIR/$ASSET_PATTERN" -C "$TMPDIR"
 
-# Find the binary
-BIN=$(find "$TMPDIR" -type f -name "codex-*-linux-gnu" | head -1)
+BIN=$(find "$TMPDIR" -type f \( -name "codex-*-linux-gnu" -o -name "codex-*-linux-musl" \) | head -1)
 
 if [[ -z $BIN ]]; then
 	echo "Error: could not find binary in archive" >&2
