@@ -1,5 +1,5 @@
 ---
-name: isomux-stop-yes-manning
+name: stop-yes-manning
 description: Reinforces principled, non-sycophantic reasoning. This skill should be used when claude starts being a yes-man. It prevents position-flipping and performative agreement.
 ---
 
