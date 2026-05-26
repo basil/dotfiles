@@ -56,8 +56,8 @@ fi
 if [[ -d ~/.zsh/functions ]]; then
 	fpath+=~/.zsh/functions
 fi
-autoload claude
-autoload codex
+[[ -o interactive ]] && autoload claude
+[[ -o interactive ]] && autoload codex
 autoload firefox
 autoload google-chrome
 autoload scp
