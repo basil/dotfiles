@@ -2,6 +2,11 @@
 set -euo pipefail
 
 REPO="openai/codex"
+# The release ships a self-describing package (codex-package.json) whose layout
+# codex resolves relative to /proc/self/exe: bin/codex plus its helper binaries
+# (codex-code-mode-host), codex-path/rg, and codex-resources/{bwrap,zsh}.
+# Unpack it whole and symlink only the entrypoint onto PATH.
+PREFIX="$HOME/.local/share/codex"
 DEST="$HOME/.local/bin/codex"
 
 TAG=$(gh release list --repo "$REPO" --limit 50 --exclude-drafts --exclude-pre-releases |
@@ -16,42 +21,72 @@ echo "Latest stable release: $TAG"
 
 ASSETS=$(gh release view "$TAG" --repo "$REPO" --json assets --jq '.assets[].name')
 
-ASSET_PATTERN=""
+ASSET=""
 for libc in gnu musl; do
-	candidate="codex-x86_64-unknown-linux-${libc}.tar.gz"
+	candidate="codex-package-x86_64-unknown-linux-${libc}.tar.gz"
 	if grep -Fxq "$candidate" <<<"$ASSETS"; then
-		ASSET_PATTERN="$candidate"
+		ASSET="$candidate"
 		break
 	fi
 done
 
-if [[ -z $ASSET_PATTERN ]]; then
-	echo "Error: no linux x86_64 asset (gnu or musl) found in $TAG" >&2
+if [[ -z $ASSET ]]; then
+	echo "Error: no linux x86_64 package asset (gnu or musl) found in $TAG" >&2
 	exit 1
 fi
 
-TMPDIR=$(mktemp -d)
-trap 'rm -rf "$TMPDIR"' EXIT
+SUMS="codex-package_SHA256SUMS"
 
-echo "Downloading $ASSET_PATTERN..."
-gh release download "$TAG" --repo "$REPO" --pattern "$ASSET_PATTERN" --dir "$TMPDIR"
+if ! grep -Fxq "$SUMS" <<<"$ASSETS"; then
+	echo "Error: $SUMS not found in $TAG" >&2
+	exit 1
+fi
+
+WORKDIR=$(mktemp -d)
+trap 'rm -rf "$WORKDIR"' EXIT
+
+echo "Downloading $ASSET..."
+gh release download "$TAG" --repo "$REPO" --pattern "$ASSET" --pattern "$SUMS" --dir "$WORKDIR"
+
+# $SUMS covers every platform, so check only our asset's line: a bare --check
+# would fail on the archives we did not download. This is an integrity check
+# against the release manifest, not a signature check.
+echo "Verifying checksum..."
+awk -v asset="$ASSET" '$2 == asset' "$WORKDIR/$SUMS" >"$WORKDIR/$SUMS.filtered"
+
+if [[ $(wc -l <"$WORKDIR/$SUMS.filtered") -ne 1 ]]; then
+	echo "Error: expected exactly one checksum entry for $ASSET in $SUMS" >&2
+	exit 1
+fi
+
+(cd "$WORKDIR" && sha256sum --strict --check "$SUMS.filtered")
 
 echo "Extracting..."
-tar -xzf "$TMPDIR/$ASSET_PATTERN" -C "$TMPDIR"
+mkdir "$WORKDIR/pkg"
+tar -xzf "$WORKDIR/$ASSET" -C "$WORKDIR/pkg"
 
-BIN=$(find "$TMPDIR" -type f \( -name "codex-*-linux-gnu" -o -name "codex-*-linux-musl" \) | head -1)
+for required in codex-package.json bin/codex; do
+	if [[ ! -e $WORKDIR/pkg/$required ]]; then
+		echo "Error: $required missing from $ASSET" >&2
+		echo "Archive contents:"
+		find "$WORKDIR/pkg" -mindepth 1
+		exit 1
+	fi
+done
 
-if [[ -z $BIN ]]; then
-	echo "Error: could not find binary in archive" >&2
-	echo "Archive contents:"
-	find "$TMPDIR" -type f
-	exit 1
+# Swap by rename so a running codex keeps its old package directory.
+mkdir -p "$(dirname "$PREFIX")"
+rm -rf "$PREFIX.new" "$PREFIX.old"
+mv "$WORKDIR/pkg" "$PREFIX.new"
+if [[ -e $PREFIX ]]; then
+	mv "$PREFIX" "$PREFIX.old"
 fi
+mv "$PREFIX.new" "$PREFIX"
+rm -rf "$PREFIX.old"
 
 mkdir -p "$(dirname "$DEST")"
-cp "$BIN" "$DEST"
-chmod +x "$DEST"
+ln -sfn "$PREFIX/bin/codex" "$DEST"
 
-echo "Installed codex $TAG to $DEST"
+echo "Installed codex $TAG to $PREFIX (linked as $DEST)"
 
 exit 0
