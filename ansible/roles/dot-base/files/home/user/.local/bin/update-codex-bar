@@ -1,0 +1,32 @@
+#!/bin/bash -eu
+
+arch=$(uname -m)
+case "$arch" in x86_64 | aarch64) ;; *)
+	echo "Unsupported architecture: $arch" >&2
+	exit 1
+	;;
+esac
+work=$(mktemp -d)
+trap 'rm -rf "$work"' EXIT
+cd "$work"
+repo=steipete/CodexBar
+version=$(gh release view --repo "$repo" --json tagName --jq '.tagName')
+cli="CodexBarCLI-$version-linux-$arch.tar.gz"
+desktop="CodexBarDesktop-$version-linux-$arch.tar.gz"
+gh release download "$version" --repo "$repo" \
+	--pattern "$cli" --pattern "$cli.sha256" \
+	--pattern "$desktop" --pattern "$desktop.sha256"
+for archive in "$cli" "$desktop"; do
+	sha256sum -c "$archive.sha256"
+done
+# Neither archive is extracted until both checksums have passed.
+cli_dir="$HOME/.local/lib/codexbar-cli"
+mkdir -p "$cli_dir" "$HOME/.local/bin"
+tar -xzf "$cli" -C "$cli_dir"
+ln -sfn "$cli_dir/codexbar" "$HOME/.local/bin/codexbar"
+"$HOME/.local/bin/codexbar" --version
+tar -xzf "$desktop"
+cd "${desktop%.tar.gz}"
+python3 Integrations/Linux/install.py --cli "$HOME/.local/bin/codexbar"
+
+exit 0
