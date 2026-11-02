@@ -90,6 +90,7 @@ if [[ $BASIL_DOTFILES_KERNEL == "Darwin" ]]; then
 	alias repair='sudo ifconfig en0 down && sleep 5 && sudo ifconfig en0 up'
 elif [[ $BASIL_DOTFILES_KERNEL == "Linux" ]]; then
 	alias open='xdg-open'
+	alias startw='exec uwsm start default'
 	if [[ -n $WAYLAND_DISPLAY ]]; then
 		alias pbcopy='wl-copy'
 		alias pbpaste='wl-paste'
