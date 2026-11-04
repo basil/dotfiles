@@ -1,5 +1,6 @@
 #!/bin/sh -eux
 
+rm -fv ~/.claude/daemon.*
 rm -fv ~/.claude/history.jsonl
 rm -fv ~/.claude/.last-cleanup
 rm -fv ~/.claude/.last-update-result.json
@@ -9,10 +10,12 @@ rm -rfv ~/.claude/bridge-spawn
 rm -rfv ~/.claude/cache
 rm -rfv ~/.claude/.cc-writes
 rm -rfv ~/.claude/chrome
+rm -rfv ~/.claude/daemon
 rm -rfv ~/.claude/dev-mods
 rm -rfv ~/.claude/downloads
 rm -rfv ~/.claude/feedback
 rm -rfv ~/.claude/file-history
+rm -rfv ~/.claude/jobs
 rm -rfv ~/.claude/paste-cache
 rm -rfv ~/.claude/plans
 rm -rfv ~/.claude/seed-admin
