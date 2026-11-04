@@ -1,0 +1,23 @@
+#!/bin/sh -eux
+
+rm -fv ~/.claude/history.jsonl
+rm -fv ~/.claude/.last-cleanup
+rm -fv ~/.claude/.last-update-result.json
+rm -fv ~/.claude/plugins/plugin-directory-cache-v2.json
+rm -rfv ~/.claude/backups
+rm -rfv ~/.claude/bridge-spawn
+rm -rfv ~/.claude/cache
+rm -rfv ~/.claude/.cc-writes
+rm -rfv ~/.claude/chrome
+rm -rfv ~/.claude/dev-mods
+rm -rfv ~/.claude/downloads
+rm -rfv ~/.claude/feedback
+rm -rfv ~/.claude/file-history
+rm -rfv ~/.claude/paste-cache
+rm -rfv ~/.claude/plans
+rm -rfv ~/.claude/seed-admin
+rm -rfv ~/.claude/session-env
+rm -rfv ~/.claude/sessions
+rm -rfv ~/.claude/shell-snapshots
+rm -rfv ~/.claude/state
+rm -rfv ~/.claude/telemetry
