@@ -4,10 +4,13 @@ rm -fv ~/.codex/*cache.json
 rm -fv ~/.codex/history*
 rm -fv ~/.codex/*.lock
 rm -fv ~/.codex/.*.lock
+rm -fv ~/.codex/packages/app-server-daemon/auto-update-version.*
 rm -fv ~/.codex/session_index*
 rm -fv ~/.codex/*.sqlite*
 rm -rfv ~/.codex/app-server-control
+rm -rfv ~/.codex/app-server-daemon
 rm -rfv ~/.codex/cache
+rm -rfv ~/.codex/editor
 rm -rfv ~/.codex/rules
 rm -rfv ~/.codex/sessions
 rm -rfv ~/.codex/shell_snapshots
