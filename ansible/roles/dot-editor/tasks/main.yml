@@ -2,9 +2,9 @@
 - include_tasks: tasks/symlink-files.yml
 
 - file:
-    path: "{{ ansible_user_dir }}/{{ item }}"
+    path: "{{ ansible_facts['user_dir'] }}/{{ item }}"
     state: directory
-    owner: "{{ ansible_user_id }}"
+    owner: "{{ ansible_facts['user_id'] }}"
     mode: 0755
   with_items:
     - .vim
@@ -16,11 +16,11 @@
 
 - get_url:
     url: "https://tpo.pe/pathogen.vim"
-    dest: "{{ ansible_user_dir }}/.vim/autoload/pathogen.vim"
+    dest: "{{ ansible_facts['user_dir'] }}/.vim/autoload/pathogen.vim"
 
 - git:
     repo: "{{ item }}"
-    dest: "{{ ansible_user_dir }}/.vim/bundle/{{ (item | basename | splitext)[0] }}"
+    dest: "{{ ansible_facts['user_dir'] }}/.vim/bundle/{{ (item | basename | splitext)[0] }}"
     update: true
   with_items:
     - https://github.com/airblade/vim-gitgutter.git
@@ -32,14 +32,14 @@
     - https://github.com/vim-airline/vim-airline.git
 
 - file:
-    path: "{{ ansible_user_dir }}/.local/share/nvim/site/pack/plugins/opt"
+    path: "{{ ansible_facts['user_dir'] }}/.local/share/nvim/site/pack/plugins/opt"
     state: directory
-    owner: "{{ ansible_user_id }}"
+    owner: "{{ ansible_facts['user_id'] }}"
     mode: 0755
 
 - git:
     repo: "{{ item }}"
-    dest: "{{ ansible_user_dir }}/.local/share/nvim/site/pack/plugins/opt/{{ (item | basename | splitext)[0] }}"
+    dest: "{{ ansible_facts['user_dir'] }}/.local/share/nvim/site/pack/plugins/opt/{{ (item | basename | splitext)[0] }}"
     update: true
   with_items:
     - https://github.com/EdenEast/nightfox.nvim.git
