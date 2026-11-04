@@ -1,0 +1,16 @@
+#!/bin/sh -eux
+
+rm -fv ~/.codex/*cache.json
+rm -fv ~/.codex/history*
+rm -fv ~/.codex/*.lock
+rm -fv ~/.codex/.*.lock
+rm -fv ~/.codex/session_index*
+rm -fv ~/.codex/*.sqlite*
+rm -rfv ~/.codex/app-server-control
+rm -rfv ~/.codex/cache
+rm -rfv ~/.codex/rules
+rm -rfv ~/.codex/sessions
+rm -rfv ~/.codex/shell_snapshots
+rm -rfv ~/.codex/thread-writer-locks
+rm -rfv ~/.codex/tmp
+rm -rfv ~/.codex/tui-thread-reference-capabilities
