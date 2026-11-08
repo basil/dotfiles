@@ -1,2 +1,9 @@
 ---
 - include_tasks: tasks/symlink-files.yml
+
+# Codex skips symlinked SKILL.md files.
+- copy:
+    src: home/user/.claude/skills/
+    dest: "{{ ansible_facts['user_dir'] }}/.agents/skills/"
+    mode: preserve
+    owner: "{{ ansible_facts['user_id'] }}"
