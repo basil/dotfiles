@@ -1,4 +1,4 @@
-#!/bin/sh -eux
+#!/bin/bash -eux
 
 rm -fv ~/.claude/daemon.*
 rm -fv ~/.claude/history.jsonl

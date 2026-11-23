@@ -1,4 +1,4 @@
-#!/bin/sh -eux
+#!/bin/bash -eux
 
 reset_codex_home() {
 	[[ -d "$1" ]] || return 0
